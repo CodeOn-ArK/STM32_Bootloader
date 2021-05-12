@@ -65,4 +65,36 @@ Backup RAM              = 4KB
 
 ##               RESET sequence in STM32
 
- 
+1) Upon RESET, the PC of the processor is loaded with the value 0x0000 0000
+
+2) Then processor loads the value@mem location 0x0000 0000 into the MSP
+
+MSP = value@0x0000 0000 ; processor first initializes the Stack Pointer register
+
+3) After this processor reads the value@mem location 0x0000 0004 into PC
+That value is actually address of the Reset Handler.
+
+4) PC jumps to RESET handler
+
+5) Actually the FLASH area starts from 0x0800 0000 but the contents are fetched from 0x0000 0000
+   this is achieved by memory aliasing. The processor produces the address 0x0000 0000 which is aliased
+   internally to 0x0800 0000. From 0x0800 0004 ( 0x0000 0004 ) the vector table starts.
+
+
+##                  Boot Configuration
+
+|-------------------------------------------------------------------------------------
+|Boot Mode Selection pins|                   |
+|------------------------|                   |
+| BOOT1     |   BOOT2    |     Boot Mode     |               Aliasing
+|-------------------------------------------------------------------------------------
+|           |            |                   |
+|     X     |     0      |   Main Flash Mem  |  Main FLASH memory is selected as the boot Area
+|           |            |                   |
+|     0     |     1      |   System Memory   |  System memory is selected as the boot area
+|           |            |                   |
+|     1     |     1      |   Embedded SRAM   |  Embedded SRAM is selcted as the boot area
+|_________________|__________________|_________________________|______________________________________________
+
+
+
