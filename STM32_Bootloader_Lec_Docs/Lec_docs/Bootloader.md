@@ -41,7 +41,7 @@ Backup RAM              = 4KB
  - Begins @     0x2000 0000
  - Ends @       0x2001 BFFF
  - Usage :      Used to application global data, static variable
-                Also Used for Stack and Heap Purpose
+.               Also Used for Stack and Heap Purpose
  - Volatility : Volatile
 
 - [x] Internal SRAM2
@@ -50,7 +50,7 @@ Backup RAM              = 4KB
  - Begins @     0x2001 C000
  - Ends @       0x2001 FFFF
  - Usage :      Used to application global data, static variable
-                Also Used for Stack and Heap Purpose
+.                Also Used for Stack and Heap Purpose
  - Volatility : Volatile
 
 - [x] ROM
@@ -59,7 +59,7 @@ Backup RAM              = 4KB
  - Begins @     0x1FFF 0000
  - Ends @       0x1FFF 77FF
  - Usage :      By default uC will not execute any code from this memory,
-                but can be configured to boot or exdcute bootloader from this mem
+.               but can be configured to boot or exdcute bootloader from this mem
  - Volatility : RO mem
 
 
