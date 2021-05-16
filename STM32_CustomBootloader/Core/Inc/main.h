@@ -52,6 +52,72 @@ extern UART_HandleTypeDef huart3;
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
+
+#define BL_ACK	0xA5
+#define BL_NACK	0x5A
+
+/********************************** Macros to define the Bootloader specific commands *****************************************/
+
+/*
+ * This Macro is used to read the bootloader version from the MCU
+ */
+ #define BL_GET_VER 0x51
+
+/*
+ * This Macro is used to know what are the supported commands
+ */
+ #define BL_GET_HELP 0x52
+
+/*
+ * This Macro is used to read the MCU Chip Identification Number
+ */
+ #define BL_GET_CID 0x53
+
+/*
+ * This Macro is used to read FLASH Read Protection Level
+ */
+ #define BL_GET_RDP_STATUS 0x54
+
+/*
+ * This Macro is used to jump to specified address
+ */
+ #define BL_GO_TO_ADDR 0x55
+
+/*
+ * This Macro is used to mass erase or sector erase of the USER FLASH
+ */
+ #define BL_FLASH_ERASE 0x56
+
+/*
+ * This Macro is used to write data into different memories of the MCU
+ */
+ #define BL_MEM_WRITE 0x57
+
+/*
+ * This Macro is used to enable read/write protection on different sectors of the user FLSH
+ */
+ #define BL_EN_R_W_PROTECT 0x58
+
+/*
+ * This Macro is used to read data from different memories of th uC
+ */
+ #define BL_MEM_READ 0x59
+
+/*
+ * This Macro is used to read all the sector protection status
+ */
+ #define BL_READ_SECTOR_STATUS 0x5A
+
+/*
+ * This Macro is used to read the OTP contents
+ */
+ #define BL_OTP_READ 0x5B
+
+/*
+ * This Macro is used to disable read/write protection on different sectors of the USER FLASH
+ */
+ #define BL_DIS_R_W_PROTECT 0x5C
+
 /* USER CODE END EM */
 
 //Bootlader specific function prototypes
@@ -63,6 +129,22 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
+void Bootloader_GET_VER(uint8_t *pRxBuffer);
+void Bootloader_GET_HELP(uint8_t *pRxBuffer);
+void Bootloader_GET_CID(uint8_t *pRxBuffer);
+void Bootloader_GET_RDP_STATUS(uint8_t *pRxBuffer);
+void Bootloader_GO_TO_ADDR(uint8_t *pRxBuffer);
+void Bootloader_FLASH_ERASE(uint8_t *pRxBuffer);
+void Bootloader_MEM_WRITE(uint8_t *pRxBuffer);
+void Bootloader_EN_R_W_PROTECT(uint8_t *pRxBuffer);
+void Bootloader_MEM_READ(uint8_t *pRxBuffer);
+void Bootloader_READ_SECTOR_STATUS(uint8_t *pRxBuffer);
+void Bootloader_OTP_READ(uint8_t *pRxBuffer);
+void Bootloader_DIS_R_W_PROTECT(uint8_t *pRxBuffer);
+
+void bootloader_send_nack(void);
+void bootloader_send_ack(uint8_t cmnd_code, uint8_t follow_len);
+void bootloader_verify_crc(uint8_t *pData, uint32_t len, uint32_t crc_host);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
