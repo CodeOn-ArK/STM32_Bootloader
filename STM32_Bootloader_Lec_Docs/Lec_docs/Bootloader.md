@@ -83,18 +83,23 @@ That value is actually address of the Reset Handler.
 
 ##                  Boot Configuration
 
-   |-------------------------------------------------------------------------------------
-       |Boot Mode Selection pins|                   |
-       |------------------------|                   |
-       | BOOT1     |   BOOT2    |     Boot Mode     |               Aliasing
-       |-------------------------------------------------------------------------------------
-       |           |            |                   |
-       |     X     |     0      |   Main Flash Mem  |  Main FLASH memory is selected as the boot Area
-       |           |            |                   |
-       |     0     |     1      |   System Memory   |  System memory is selected as the boot area
-       |           |            |                   |
-       |     1     |     1      |   Embedded SRAM   |  Embedded SRAM is selcted as the boot area
-       |___________|__________________|_________________________|______________________________________________
+>           |-------------------------------------------------------------------------------------
+>           |Boot Mode Selection pins|                   |
+>           |------------------------|                   |
+>           | BOOT1     |   BOOT2    |     Boot Mode     |               Aliasing
+>           |-------------------------------------------------------------------------------------
+>           |           |            |                   |
+>           |     X     |     0      |   Main Flash Mem  |  Main FLASH memory is selected as the boot Area
+>           |           |            |                   |
+>           |     0     |     1      |   System Memory   |  System memory is selected as the boot area
+>           |           |            |                   |
+>           |     1     |     1      |   Embedded SRAM   |  Embedded SRAM is selcted as the boot area
+>           |___________|____________|___________________|______________________________________________
+
+Here's our data packet format
 
 ![plot](https://github.com/CodeOn-ArK/STM32_CustomBootloader/blob/master/STM32_Bootloader_Lec_Docs/Lec_docs/Screenshot_3.png)
 
+Here's an example:
+
+![plot](https://github.com/CodeOn-ArK/STM32_CustomBootloader/blob/master/STM32_Bootloader_Lec_Docs/Lec_docs/Screenshot_4.png)
