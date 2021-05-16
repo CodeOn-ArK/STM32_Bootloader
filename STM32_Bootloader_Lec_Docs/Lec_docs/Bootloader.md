@@ -96,5 +96,5 @@ That value is actually address of the Reset Handler.
 |     1     |     1      |   Embedded SRAM   |  Embedded SRAM is selcted as the boot area
 |_________________|__________________|_________________________|______________________________________________
 
-
+![plot](/home/ark/st/STM32_Bootloader/STM32_Bootloader_Lec_Docs/Lec_docs/Screenshot_3.jpg)
 
