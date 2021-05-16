@@ -83,18 +83,18 @@ That value is actually address of the Reset Handler.
 
 ##                  Boot Configuration
 
-|-------------------------------------------------------------------------------------
-|Boot Mode Selection pins|                   |
-|------------------------|                   |
-| BOOT1     |   BOOT2    |     Boot Mode     |               Aliasing
-|-------------------------------------------------------------------------------------
-|           |            |                   |
-|     X     |     0      |   Main Flash Mem  |  Main FLASH memory is selected as the boot Area
-|           |            |                   |
-|     0     |     1      |   System Memory   |  System memory is selected as the boot area
-|           |            |                   |
-|     1     |     1      |   Embedded SRAM   |  Embedded SRAM is selcted as the boot area
-|_________________|__________________|_________________________|______________________________________________
+   |-------------------------------------------------------------------------------------
+   |Boot Mode Selection pins|                   |
+   |------------------------|                   |
+   | BOOT1     |   BOOT2    |     Boot Mode     |               Aliasing
+   |-------------------------------------------------------------------------------------
+   |           |            |                   |
+   |     X     |     0      |   Main Flash Mem  |  Main FLASH memory is selected as the boot Area
+   |           |            |                   |
+   |     0     |     1      |   System Memory   |  System memory is selected as the boot area
+   |           |            |                   |
+   |     1     |     1      |   Embedded SRAM   |  Embedded SRAM is selcted as the boot area
+   |_________________|__________________|_________________________|______________________________________________
 
 ![plot](/home/ark/st/STM32_Bootloader/STM32_Bootloader_Lec_Docs/Lec_docs/Screenshot_3.jpg)
 
