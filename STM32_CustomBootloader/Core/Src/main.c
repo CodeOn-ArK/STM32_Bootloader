@@ -28,6 +28,22 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+/*
+ * All the supported commands are packed here
+ */
+uint8_t supported_cmnds[] = {
+		BL_GET_VER,
+		BL_GET_HELP,
+		BL_GET_RDP_STATUS,
+		BL_GET_CID,
+		BL_GO_TO_ADDR,
+		BL_FLASH_ERASE,
+		BL_MEM_WRITE,
+		BL_EN_R_W_PROTECT,
+		BL_MEM_READ,
+		BL_MEM_WRITE
+};
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -444,7 +460,7 @@ void Bootloader_GET_VER(uint8_t *pRxBuffer)
 		bootloader_uart_write_data(&bl_version,1);
 
 	}else{
-		printMsg("BL-DEBUG_MSG : checksum fail !!\n\r");
+		printMsg("BL_DEBUG_MSG : checksum fail !!\n\r");
 
 		//checksum is wrong send nack
 		bootloader_send_nack();
@@ -453,11 +469,74 @@ void Bootloader_GET_VER(uint8_t *pRxBuffer)
 
 void Bootloader_GET_HELP(uint8_t *pRxBuffer)
 {
+	//Send the number of commands supported by the bootloader
+
+	printMsg("BL_DEBUG_MSG : bootloader_get_help\n\r");
+
+	//1. Extract packet length
+	uint32_t packt_len = pRxBuffer[0] + 1;
+
+	//2. Extract the CRC sent by HOST
+	uint32_t Host_CRC = *((uint32_t *)(pRxBuffer + packt_len - 4));
+
+	//3. Verify CRC
+	if(bootloader_verify_crc(pRxBuffer, packt_len - 4, Host_CRC) == CRC_VERIFY_SUCCESS)
+	{
+		//Checksum is correct
+		printMsg("BL_DEBUG_MSG : checksum success !!\n\r");
+
+		//Send ACK to HOST program
+		bootloader_send_ack(*pRxBuffer, 10);
+
+		bootloader_uart_write_data(supported_cmnds, sizeof(supported_cmnds));
+	}else
+	{
+		//Checksum failure
+		printMsg("BL_DEBUG_MSG : checksum fail !!\n\r");
+
+		//Send NACK to HOST
+		bootloader_send_nack();
+	}
 
 }
 
 void Bootloader_GET_CID(uint8_t *pRxBuffer)
 {
+	//Send the number of commands supported by the bootloader
+
+	printMsg("BL_DEBUG_MSG : bootloader_get_CID\n\r");
+
+	//1. Extract packet length
+	uint32_t packt_len = pRxBuffer[0] + 1;
+
+	//2. Extract the CRC sent by HOST
+	uint32_t Host_CRC = *((uint32_t *)(pRxBuffer + packt_len - 4));
+
+	//3. Verify CRC
+	if(bootloader_verify_crc(pRxBuffer, packt_len - 4, Host_CRC) == CRC_VERIFY_SUCCESS)
+	{
+		//Checksum is correct
+		printMsg("BL_DEBUG_MSG : checksum success !!\n\r");
+
+		//Send ACK to HOST program
+		bootloader_send_ack(*pRxBuffer, 2);
+
+		//Get the CID
+		volatile uint32_t CID = get_CID_info();
+
+		printMsg("BL_DEBUG_MSG : CID_Number : %ld %#x\n\r", CID, CID);
+
+		//send to the host command
+		bootloader_uart_write_data((uint8_t *)CID, 2);
+
+	}else
+	{
+		//Checksum failure
+		printMsg("BL_DEBUG_MSG : checksum fail !!\n\r");
+
+		//Send NACK to HOST
+		bootloader_send_nack();
+	}
 
 }
 void Bootloader_GET_RDP_STATUS(uint8_t *pRxBuffer)
@@ -549,7 +628,10 @@ void bootloader_uart_write_data(uint8_t *pRxBuffer, uint8_t len)
 }
 
 
-
+uint32_t get_CID_info()
+{
+	return (*DBGMCU_IDCODE);
+}
 
 
 

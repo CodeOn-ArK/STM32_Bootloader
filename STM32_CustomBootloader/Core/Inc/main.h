@@ -122,6 +122,9 @@ extern UART_HandleTypeDef huart3;
  */
  #define BL_DIS_R_W_PROTECT 0x5C
 
+
+#define DBGMCU_IDCODE ((volatile uint32_t *)0xE0042000)
+
 /* USER CODE END EM */
 
 //Bootlader specific function prototypes
@@ -151,6 +154,7 @@ void bootloader_send_ack(uint8_t cmnd_code, uint8_t follow_len);
 uint8_t bootloader_verify_crc(uint8_t *pData, uint32_t len, uint32_t crc_host);
 uint8_t get_bootloader_version();
 void bootloader_uart_write_data(uint8_t *pRxBuffer, uint8_t len);
+uint32_t get_CID_info();
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
