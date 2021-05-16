@@ -55,7 +55,11 @@ extern UART_HandleTypeDef huart3;
 
 #define BL_ACK	0xA5
 #define BL_NACK	0x5A
+#define CRC_VERIFY_FAILURE 0xAF
+#define CRC_VERIFY_SUCCESS 0xFA
 
+//version 1.0
+#define BL_VERSION 0x10
 /********************************** Macros to define the Bootloader specific commands *****************************************/
 
 /*
@@ -144,7 +148,9 @@ void Bootloader_DIS_R_W_PROTECT(uint8_t *pRxBuffer);
 
 void bootloader_send_nack(void);
 void bootloader_send_ack(uint8_t cmnd_code, uint8_t follow_len);
-void bootloader_verify_crc(uint8_t *pData, uint32_t len, uint32_t crc_host);
+uint8_t bootloader_verify_crc(uint8_t *pData, uint32_t len, uint32_t crc_host);
+uint8_t get_bootloader_version();
+void bootloader_uart_write_data(uint8_t *pRxBuffer, uint8_t len);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

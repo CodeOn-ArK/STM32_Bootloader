@@ -95,7 +95,7 @@ static void printMsg(char *format,...)
 	HAL_Delay(10);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, RESET);
 
-	HAL_UART_Transmit(C_UART, (uint8_t *)str, strlen(str), HAL_MAX_DELAY);
+	HAL_UART_Transmit(D_UART, (uint8_t *)str, strlen(str), HAL_MAX_DELAY);
 
 	va_end(args);
 #endif //DEBUG_SUPPORT
@@ -426,7 +426,13 @@ void Bootloader_GET_VER(uint8_t *pRxBuffer)
 	//1. verify the checksum
 	printMsg("BL_DEBUG_MSG : bootloader_handle_getver_cmd\n\r");
 
-	if(! (bootloader_verify_crc(&pRxBuffer[0], pRxBuffer[0] + 1, 0)) )
+	//2.Total command packet length
+	uint32_t packt_len = pRxBuffer[0] + 1;
+
+	//3. Shell out CRC from host from the received buffer
+	uint32_t Host_CRC = *((uint32_t *)(pRxBuffer + packt_len - 4));
+
+	if((bootloader_verify_crc(pRxBuffer, packt_len - 4, Host_CRC)) == CRC_VERIFY_SUCCESS)
 	{
 		printMsg("BL_DEBUG_MSG : checksum success !!\n\r");
 
@@ -444,10 +450,12 @@ void Bootloader_GET_VER(uint8_t *pRxBuffer)
 		bootloader_send_nack();
 	}
 }
+
 void Bootloader_GET_HELP(uint8_t *pRxBuffer)
 {
 
 }
+
 void Bootloader_GET_CID(uint8_t *pRxBuffer)
 {
 
@@ -503,9 +511,62 @@ void bootloader_send_ack(uint8_t cmnd_code, uint8_t follow_len)
 void bootloader_send_nack(void)
 {
 	//here we send nack in response to data invalidity from CRC
-	uint8_t NACK = BL_NACK;
-	HAL_UART_Transmit(C_UART, &NACK, 1, HAL_MAX_DELAY);
+	uint8_t NACK[1];
+	NACK[0] = (uint8_t)BL_NACK;
+	HAL_UART_Transmit(C_UART, NACK, 1, HAL_MAX_DELAY);
 }
+
+uint8_t bootloader_verify_crc(uint8_t pData[], uint32_t len, uint32_t crc_host)
+{
+
+	volatile uint32_t CRCVal = 0x00000000;
+	uint32_t accumulated_data = 0;
+
+	for(uint8_t i=0; i<len; i++)
+	{
+		accumulated_data = pData[i];
+		CRCVal = HAL_CRC_Accumulate(&hcrc, &accumulated_data, 1);
+	}
+
+	if(CRCVal == crc_host)
+	{
+		return CRC_VERIFY_SUCCESS;
+	}
+
+		return CRC_VERIFY_FAILURE;
+
+}
+
+uint8_t get_bootloader_version(void)
+{
+	return BL_VERSION;
+}
+
+//This function is called to Send data to the HOST over the C_UART
+void bootloader_uart_write_data(uint8_t *pRxBuffer, uint8_t len)
+{
+	HAL_UART_Transmit(C_UART, pRxBuffer, len, HAL_MAX_DELAY);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* USER CODE END 4 */
 
