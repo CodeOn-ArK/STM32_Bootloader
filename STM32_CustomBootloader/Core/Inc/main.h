@@ -123,7 +123,6 @@ extern UART_HandleTypeDef huart3;
  #define BL_DIS_R_W_PROTECT 0x5C
 
 
-#define DBGMCU_IDCODE ((volatile uint32_t *)0xE0042000)
 
 /* USER CODE END EM */
 
@@ -155,6 +154,9 @@ uint8_t bootloader_verify_crc(uint8_t *pData, uint32_t len, uint32_t crc_host);
 uint8_t get_bootloader_version();
 void bootloader_uart_write_data(uint8_t *pRxBuffer, uint8_t len);
 uint32_t get_CID_info();
+uint8_t get_RDP_info();
+void EN_R_W_Protect(void);
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -175,6 +177,8 @@ uint32_t get_CID_info();
 /* USER CODE BEGIN Private defines */
 
 #define FLASH_SECTOR2_BASE_ADDRESS (0x08008000U)
+#define DBGMCU_IDCODE ((volatile uint32_t *)0xE0042000)
+#define OPTION_BYTES_BASE_ADDRESS ((uint32_t *)(0x1FFFC000))
 
 /* USER CODE END Private defines */
 

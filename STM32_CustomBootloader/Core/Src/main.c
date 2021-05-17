@@ -185,6 +185,8 @@ void  bootloader_uart_read_data()
 
 		HAL_UART_Receive(C_UART, &bl_rx_buffer[1], rcv_len, HAL_MAX_DELAY);
 
+		MX_CRC_Init();
+
 		switch(bl_rx_buffer[1])
 		{
 		case BL_GET_VER :Bootloader_GET_VER(bl_rx_buffer);
@@ -527,7 +529,7 @@ void Bootloader_GET_CID(uint8_t *pRxBuffer)
 		printMsg("BL_DEBUG_MSG : CID_Number : %ld %#x\n\r", CID, CID);
 
 		//send to the host command
-		bootloader_uart_write_data((uint8_t *)CID, 2);
+		bootloader_uart_write_data(&CID, 2);
 
 	}else
 	{
@@ -541,10 +543,82 @@ void Bootloader_GET_CID(uint8_t *pRxBuffer)
 }
 void Bootloader_GET_RDP_STATUS(uint8_t *pRxBuffer)
 {
+	//Send the number of commands supported by the bootloader
+
+	printMsg("BL_DEBUG_MSG : bootloader_get_RDP_status\n\r");
+
+	//1. Extract packet length
+	uint32_t packt_len = pRxBuffer[0] + 1;
+
+	//2. Extract the CRC sent by HOST
+	uint32_t Host_CRC = *((uint32_t *)(pRxBuffer + packt_len - 4));
+
+	//3. Verify CRC
+	if(bootloader_verify_crc(pRxBuffer, packt_len - 4, Host_CRC) == CRC_VERIFY_SUCCESS)
+	{
+		//Checksum is correct
+		printMsg("BL_DEBUG_MSG : checksum success !!\n\r");
+
+		//Send ACK to HOST program
+		bootloader_send_ack(*pRxBuffer, 1);
+
+		//Get the CID
+		volatile uint8_t RDP_Status = get_RDP_info();
+
+		printMsg("BL_DEBUG_MSG : RDP_Number : %ld %#x\n\r", RDP_Status, RDP_Status);
+
+		//send to the host command
+		bootloader_uart_write_data(&RDP_Status, 1);
+
+	}else
+	{
+		//Checksum failure
+		printMsg("BL_DEBUG_MSG : checksum fail !!\n\r");
+
+		//Send NACK to HOST
+		bootloader_send_nack();
+	}
 
 }
+
+
 void Bootloader_GO_TO_ADDR(uint8_t *pRxBuffer)
 {
+	//Send the number of commands supported by the bootloader
+
+	printMsg("BL_DEBUG_MSG : bootloader_get_RDP_status\n\r");
+
+	//1. Extract packet length
+	uint32_t packt_len = pRxBuffer[0] + 1;
+
+	//2. Extract the CRC sent by HOST
+	uint32_t Host_CRC = *((uint32_t *)(pRxBuffer + packt_len - 4));
+
+	//3. Verify CRC
+	if(bootloader_verify_crc(pRxBuffer, packt_len - 4, Host_CRC) == CRC_VERIFY_SUCCESS)
+	{
+		//Checksum is correct
+		printMsg("BL_DEBUG_MSG : checksum success !!\n\r");
+
+		//Send ACK to HOST program
+		bootloader_send_ack(*pRxBuffer, 1);
+
+		//Get the CID
+		volatile uint8_t RDP_Status = get_RDP_info();
+
+		printMsg("BL_DEBUG_MSG : RDP_Number : %ld %#x\n\r", RDP_Status, RDP_Status);
+
+		//send to the host command
+		bootloader_uart_write_data(&RDP_Status, 1);
+
+	}else
+	{
+		//Checksum failure
+		printMsg("BL_DEBUG_MSG : checksum fail !!\n\r");
+
+		//Send NACK to HOST
+		bootloader_send_nack();
+	}
 
 }
 void Bootloader_FLASH_ERASE(uint8_t *pRxBuffer)
@@ -555,10 +629,55 @@ void Bootloader_MEM_WRITE(uint8_t *pRxBuffer)
 {
 
 }
+
 void Bootloader_EN_R_W_PROTECT(uint8_t *pRxBuffer)
 {
 
+	//Send the number of commands supported by the bootloader
+
+	printMsg("BL_DEBUG_MSG : Bootloader_EN_R_W_PROTECT\n\r");
+
+	//1. Extract packet length
+	uint32_t packt_len = pRxBuffer[0] + 1;
+
+	//2. Extract the CRC sent by HOST
+	uint32_t Host_CRC = *((uint32_t *)(pRxBuffer + packt_len - 4));
+
+	//3. Verify CRC
+	if(bootloader_verify_crc(pRxBuffer, packt_len - 4, Host_CRC) == CRC_VERIFY_SUCCESS)
+	{
+		//Checksum is correct
+		printMsg("BL_DEBUG_MSG : checksum success !!\n\r");
+
+		//Send ACK to HOST program
+		bootloader_send_ack(*pRxBuffer, 1);
+
+		//Enable R/W protection of the FLASH area (program OPTION bytes to 0xFF)
+		EN_R_W_Protect();
+
+		//printMsg("BL_DEBUG_MSG : RDP_Number : %ld %#x\n\r", RDP_Status, RDP_Status);
+
+		//send to the host command
+		//bootloader_uart_write_data(, 1);
+
+	}else
+	{
+		//Checksum failure
+		printMsg("BL_DEBUG_MSG : checksum fail !!\n\r");
+
+		//Send NACK to HOST
+		bootloader_send_nack();
+	}
+
+
+
 }
+
+void Bootloader_DIS_R_W_PROTECT(uint8_t *pRxBuffer)
+{
+
+}
+
 void Bootloader_MEM_READ(uint8_t *pRxBuffer)
 {
 
@@ -571,10 +690,13 @@ void Bootloader_OTP_READ(uint8_t *pRxBuffer)
 {
 
 }
-void Bootloader_DIS_R_W_PROTECT(uint8_t *pRxBuffer)
-{
 
-}
+
+
+/***********************************************************************************/
+
+
+
 
 void bootloader_send_ack(uint8_t cmnd_code, uint8_t follow_len)
 {
@@ -633,9 +755,19 @@ uint32_t get_CID_info()
 	return (*DBGMCU_IDCODE);
 }
 
+//This function returns Read Protection Level of the OPTION bytes(16B)
+uint8_t get_RDP_info()
+{
+	uint32_t RDP_status = *OPTION_BYTES_BASE_ADDRESS;
+
+	return(RDP_status >> 8);
+}
 
 
+void EN_R_W_Protect(void)
+{
 
+}
 
 
 
