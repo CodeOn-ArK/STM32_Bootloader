@@ -156,6 +156,7 @@ void bootloader_uart_write_data(uint8_t *pRxBuffer, uint8_t len);
 uint32_t get_CID_info();
 uint8_t get_RDP_info();
 void EN_R_W_Protect(void);
+uint8_t check_validity(uint32_t);
 
 /* USER CODE END EFP */
 
@@ -179,6 +180,23 @@ void EN_R_W_Protect(void);
 #define FLASH_SECTOR2_BASE_ADDRESS (0x08008000U)
 #define DBGMCU_IDCODE ((volatile uint32_t *)0xE0042000)
 #define OPTION_BYTES_BASE_ADDRESS ((uint32_t *)(0x1FFFC000))
+
+#define ADDRESS_VALID 0x0
+#define ADDRESS_INVALID 0x1
+
+#define SRAM1_SIZE 112
+#define SRAM2_SIZE 16
+#define BKPSRAM_SIZE 4
+#define SRAM1_END (SRAM1_BASE + (SRAM1_SIZE * 1024))
+#define SRAM2_END (SRAM2_BASE + (SRAM2_SIZE * 1024))
+#define BKPSRAM_END (BKPSRAM_BASE + (BKPSRAM_SIZE * 1024))
+
+/*
+#define
+#define
+#define
+#define
+*/
 
 /* USER CODE END Private defines */
 

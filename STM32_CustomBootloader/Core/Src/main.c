@@ -585,8 +585,7 @@ void Bootloader_GET_RDP_STATUS(uint8_t *pRxBuffer)
 void Bootloader_GO_TO_ADDR(uint8_t *pRxBuffer)
 {
 	//Send the number of commands supported by the bootloader
-
-	printMsg("BL_DEBUG_MSG : bootloader_get_RDP_status\n\r");
+	printMsg("BL_DEBUG_MSG : bootloader_go_to_addr\n\r");
 
 	//1. Extract packet length
 	uint32_t packt_len = pRxBuffer[0] + 1;
@@ -603,13 +602,37 @@ void Bootloader_GO_TO_ADDR(uint8_t *pRxBuffer)
 		//Send ACK to HOST program
 		bootloader_send_ack(*pRxBuffer, 1);
 
-		//Get the CID
-		volatile uint8_t RDP_Status = get_RDP_info();
+		//shell out the address sent by HOST
+		volatile uint32_t goto_addr = *((uint32_t*)(pRxBuffer + 2));
 
-		printMsg("BL_DEBUG_MSG : RDP_Number : %ld %#x\n\r", RDP_Status, RDP_Status);
+		printMsg("BL_DEBUG_MSG : Jump address %#x\n\r", goto_addr);
 
-		//send to the host command
-		bootloader_uart_write_data(&RDP_Status, 1);
+		//Check address validity; jump to address if address valid
+		if(check_validity(goto_addr))
+		{
+			uint8_t validity = (uint8_t)ADDRESS_VALID;
+			bootloader_uart_write_data(&validity, 1);
+
+			//address is valid
+			printMsg("BL_DEBUG_MSG : Address valid !!\n\r");
+
+			goto_addr += 1; //T-bit made 1 here
+
+			void (*jump_to_addr)(void) = (void *)goto_addr;
+
+
+			//jumping to address
+			printMsg("BL_DEBUG_MSG : jumping to address\n\r");
+			jump_to_addr();
+
+		}else
+		{
+			uint8_t validity = (uint8_t)ADDRESS_INVALID;
+			bootloader_uart_write_data(&validity, 1);
+
+			//address invalid
+			printMsg("BL_DEBUG_MSG : Address invalid!!\n\r");
+		}
 
 	}else
 	{
@@ -769,6 +792,39 @@ void EN_R_W_Protect(void)
 
 }
 
+uint8_t check_validity(uint32_t addr)
+{
+	/*
+	 * valid addresses :-
+	 *
+	 * FLASH
+	 * SRAM1 && SRAM2
+	 * RAM
+	 * BACKUP SRAM
+	 * External FLASH
+	 */
+
+	if(addr >= FLASH_BASE && addr <= FLASH_END)
+	{
+		return ADDRESS_VALID;
+
+	}else if(addr >= SRAM1_BASE && addr <= SRAM1_END)
+	{
+		return ADDRESS_VALID;
+
+	}else if(addr >= SRAM2_BASE && addr <= SRAM2_END)
+	{
+		return ADDRESS_VALID;
+
+	}else if(addr >= BKPSRAM_BASE && addr <= BKPSRAM_END)
+	{
+		return ADDRESS_VALID;
+
+	}
+
+	return ADDRESS_INVALID;
+
+}
 
 
 
