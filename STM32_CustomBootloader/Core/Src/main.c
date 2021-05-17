@@ -608,7 +608,7 @@ void Bootloader_GO_TO_ADDR(uint8_t *pRxBuffer)
 		printMsg("BL_DEBUG_MSG : Jump address %#x\n\r", goto_addr);
 
 		//Check address validity; jump to address if address valid
-		if(check_validity(goto_addr))
+		if(!check_validity(goto_addr))
 		{
 			uint8_t validity = (uint8_t)ADDRESS_VALID;
 			bootloader_uart_write_data(&validity, 1);
@@ -646,6 +646,54 @@ void Bootloader_GO_TO_ADDR(uint8_t *pRxBuffer)
 }
 void Bootloader_FLASH_ERASE(uint8_t *pRxBuffer)
 {
+	//1. verify the checksum
+	printMsg("BL_DEBUG_MSG : bootloader_FLASH_ERASE\n\r");
+
+	//2.Total command packet length
+	uint32_t packt_len = pRxBuffer[0] + 1;
+
+	//3. Shell out CRC from host from the received buffer
+	uint32_t Host_CRC = *((uint32_t *)(pRxBuffer + packt_len - 4));
+
+	if((bootloader_verify_crc(pRxBuffer, packt_len - 4, Host_CRC)) == CRC_VERIFY_SUCCESS)
+	{
+		printMsg("BL_DEBUG_MSG : checksum success !!\n\r");
+
+		//checksum is correct
+		bootloader_send_ack(pRxBuffer[0], 1);
+
+		FLASH_EraseInitTypeDef pEraseInit;
+		uint32_t SectorError;
+
+		if(*(pRxBuffer+2) != 0xFF)
+		{
+			pEraseInit.TypeErase = FLASH_TYPEERASE_SECTORS;
+			pEraseInit.Sector	 = pRxBuffer[2];
+			pEraseInit.NbSectors = pRxBuffer[3];
+			pEraseInit.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+		}else
+		{
+			pEraseInit.TypeErase = FLASH_TYPEERASE_MASSERASE;
+			pEraseInit.Sector	 = 0;
+			pEraseInit.NbSectors = 7;
+			pEraseInit.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+		}
+
+		HAL_FLASH_Unlock();
+
+		if(HAL_FLASHEx_Erase(&pEraseInit, &SectorError) != HAL_OK) Error_Handler();
+
+		pRxBuffer[0] = 0x0;
+		if(SectorError == 0xFFFFFFFF) bootloader_uart_write_data(pRxBuffer, 1);
+
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+
+	}else{
+		printMsg("BL_DEBUG_MSG : checksum fail !!\n\r");
+
+		//checksum is wrong send nack
+		bootloader_send_nack();
+	}
 
 }
 void Bootloader_MEM_WRITE(uint8_t *pRxBuffer)
