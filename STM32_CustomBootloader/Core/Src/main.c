@@ -662,29 +662,11 @@ void Bootloader_FLASH_ERASE(uint8_t *pRxBuffer)
 		//checksum is correct
 		bootloader_send_ack(pRxBuffer[0], 1);
 
-		FLASH_EraseInitTypeDef pEraseInit;
-		uint32_t SectorError;
+		uint32_t err_no;
 
-		if(*(pRxBuffer+2) != 0xFF)
-		{
-			pEraseInit.TypeErase = FLASH_TYPEERASE_SECTORS;
-			pEraseInit.Sector	 = pRxBuffer[2];
-			pEraseInit.NbSectors = pRxBuffer[3];
-			pEraseInit.VoltageRange = FLASH_VOLTAGE_RANGE_3;
-		}else
-		{
-			pEraseInit.TypeErase = FLASH_TYPEERASE_MASSERASE;
-			pEraseInit.Sector	 = 0;
-			pEraseInit.NbSectors = 7;
-			pEraseInit.VoltageRange = FLASH_VOLTAGE_RANGE_3;
-		}
+		err_no = flash_eraser(pRxBuffer[2], pRxBuffer[3]);
 
-		HAL_FLASH_Unlock();
-
-		if(HAL_FLASHEx_Erase(&pEraseInit, &SectorError) != HAL_OK) Error_Handler();
-
-		pRxBuffer[0] = 0x0;
-		if(SectorError == 0xFFFFFFFF) bootloader_uart_write_data(pRxBuffer, 1);
+		bootloader_uart_write_data(&err_no, sizeof(err_no));
 
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 
@@ -872,6 +854,38 @@ uint8_t check_validity(uint32_t addr)
 
 	return ADDRESS_INVALID;
 
+}
+
+uint32_t flash_eraser(uint8_t sector_num, uint8_t num_of_sector)
+{
+		FLASH_EraseInitTypeDef pEraseInit;
+		uint32_t SectorError;
+
+		if(sector_num == 0xFF)
+		{
+			pEraseInit.TypeErase = FLASH_TYPEERASE_MASSERASE;
+			pEraseInit.Sector	 = 0;
+			pEraseInit.NbSectors = 8;
+
+		}else
+		{
+			pEraseInit.TypeErase = FLASH_TYPEERASE_SECTORS;
+			pEraseInit.Sector	 = sector_num;
+			pEraseInit.NbSectors = num_of_sector;
+
+		}
+
+		pEraseInit.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+
+		if(sector_num > 8 && sector_num != 0xFF) return INVALID_SECTOR;
+
+		HAL_FLASH_Unlock();
+		uint32_t err_code = HAL_FLASHEx_Erase(&pEraseInit, &SectorError);
+		HAL_FLASH_Lock();
+
+		printMsg("BL_DEBUG_MSG : Error_Code : %#x \n\r", err_code);
+
+		return err_code;
 }
 
 

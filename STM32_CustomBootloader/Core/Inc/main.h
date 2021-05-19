@@ -157,6 +157,7 @@ uint32_t get_CID_info();
 uint8_t get_RDP_info();
 void EN_R_W_Protect(void);
 uint8_t check_validity(uint32_t);
+uint32_t flash_eraser(uint8_t sector_num, uint8_t num_of_sector);
 
 /* USER CODE END EFP */
 
@@ -191,6 +192,7 @@ uint8_t check_validity(uint32_t);
 #define SRAM2_END (SRAM2_BASE + (SRAM2_SIZE * 1024))
 #define BKPSRAM_END (BKPSRAM_BASE + (BKPSRAM_SIZE * 1024))
 
+#define INVALID_SECTOR 0x1
 /*
 #define
 #define
