@@ -680,7 +680,49 @@ void Bootloader_FLASH_ERASE(uint8_t *pRxBuffer)
 }
 void Bootloader_MEM_WRITE(uint8_t *pRxBuffer)
 {
+	//Save the memory address in a variable
+	uint32_t Base_mem_addr = *((uint32_t *)(pRxBuffer + 2));
+	uint8_t payload_len = pRxBuffer[6];
 
+	//1. verify the checksum
+	printMsg("BL_DEBUG_MSG : bootloader_MEM_Write\n\r");
+
+	//2.Total command packet length
+	uint32_t packt_len = pRxBuffer[0] + 1;
+
+	//3. Shell out CRC from host from the received buffer
+	uint32_t Host_CRC = *((uint32_t *)(pRxBuffer + packt_len - 4));
+
+	if((bootloader_verify_crc(pRxBuffer, packt_len - 4, Host_CRC)) == CRC_VERIFY_SUCCESS)
+	{
+		printMsg("BL_DEBUG_MSG : checksum success !!\n\r");
+
+		//checksum is correct
+		bootloader_send_ack(pRxBuffer[0], 1);
+
+		if( !check_validity(Base_mem_addr) )
+		{
+			printMsg("BL_DEBUG_MSG : Address valid!!\n\r");
+
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+			uint8_t return_code = memory_write(&pRxBuffer[7], Base_mem_addr, payload_len);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+
+			bootloader_uart_write_data(return_code, 1);
+		}else
+		{
+			printMsg("BL_DEBUG_MSG : Address Invalid!!\n\r");
+
+			pRxBuffer[0] = 0x1;
+			bootloader_uart_write_data(pRxBuffer, 1);
+		}
+
+	}else{
+		printMsg("BL_DEBUG_MSG : checksum fail !!\n\r");
+
+		//checksum is wrong send nack
+		bootloader_send_nack();
+	}
 }
 
 void Bootloader_EN_R_W_PROTECT(uint8_t *pRxBuffer)
@@ -886,6 +928,22 @@ uint32_t flash_eraser(uint8_t sector_num, uint8_t num_of_sector)
 		printMsg("BL_DEBUG_MSG : Error_Code : %#x \n\r", err_code);
 
 		return err_code;
+}
+
+uint8_t memory_write(uint8_t *buffer, uint32_t Base_addr, uint8_t payload_len)
+{
+	volatile uint8_t err_code, i=0;
+
+	//Unlock the FLASH module
+	HAL_FLASH_Unlock();
+
+	while(i < payload_len)
+	err_code = HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, Base_addr, buffer[i++]);
+
+	//Lock the flash module to prevent furhter damage
+	HAL_FLASH_Lock();
+
+	return err_code;
 }
 
 

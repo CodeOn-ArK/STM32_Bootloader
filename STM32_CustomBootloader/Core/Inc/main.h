@@ -158,6 +158,7 @@ uint8_t get_RDP_info();
 void EN_R_W_Protect(void);
 uint8_t check_validity(uint32_t);
 uint32_t flash_eraser(uint8_t sector_num, uint8_t num_of_sector);
+uint8_t memory_write(uint8_t *buffer, uint32_t Base_addr);
 
 /* USER CODE END EFP */
 
