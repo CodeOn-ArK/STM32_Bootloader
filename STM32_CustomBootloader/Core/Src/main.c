@@ -263,176 +263,6 @@ void  bootloader_jump_to_user_app()
 	app_reset_handler();
 
 }
-
-/**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-
-  /** Configure the main internal regulator output voltage
-  */
-  __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
-  /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 16;
-  RCC_OscInitStruct.PLL.PLLN = 336;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
-  RCC_OscInitStruct.PLL.PLLQ = 2;
-  RCC_OscInitStruct.PLL.PLLR = 2;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-
-/**
-  * @brief CRC Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_CRC_Init(void)
-{
-
-  /* USER CODE BEGIN CRC_Init 0 */
-
-  /* USER CODE END CRC_Init 0 */
-
-  /* USER CODE BEGIN CRC_Init 1 */
-
-  /* USER CODE END CRC_Init 1 */
-  hcrc.Instance = CRC;
-  if (HAL_CRC_Init(&hcrc) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN CRC_Init 2 */
-
-  /* USER CODE END CRC_Init 2 */
-
-}
-
-/**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART2_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART2_Init 0 */
-
-  /* USER CODE END USART2_Init 0 */
-
-  /* USER CODE BEGIN USART2_Init 1 */
-
-  /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART2_Init 2 */
-
-  /* USER CODE END USART2_Init 2 */
-
-}
-
-/**
-  * @brief USART3 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART3_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART3_Init 0 */
-
-  /* USER CODE END USART3_Init 0 */
-
-  /* USER CODE BEGIN USART3_Init 1 */
-
-  /* USER CODE END USART3_Init 1 */
-  huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
-  huart3.Init.WordLength = UART_WORDLENGTH_8B;
-  huart3.Init.StopBits = UART_STOPBITS_1;
-  huart3.Init.Parity = UART_PARITY_NONE;
-  huart3.Init.Mode = UART_MODE_TX_RX;
-  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart3) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART3_Init 2 */
-
-  /* USER CODE END USART3_Init 2 */
-
-}
-
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : B1_Pin */
-  GPIO_InitStruct.Pin = B1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
-
-}
-
 /* USER CODE BEGIN 4 */
 
 /***************************** Implementation of the Bootloader specified function calls ****************************************/
@@ -625,6 +455,9 @@ void Bootloader_GO_TO_ADDR(uint8_t *pRxBuffer)
 			printMsg("BL_DEBUG_MSG : jumping to address\n\r");
 			jump_to_addr();
 
+			pRxBuffer[0] = 0;
+			bootloader_uart_write_data(pRxBuffer, 1);
+
 		}else
 		{
 			uint8_t validity = (uint8_t)ADDRESS_INVALID;
@@ -708,6 +541,7 @@ void Bootloader_MEM_WRITE(uint8_t *pRxBuffer)
 			uint8_t return_code = memory_write(&pRxBuffer[7], Base_mem_addr, payload_len);
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 
+			return_code = 1;
 			bootloader_uart_write_data(return_code, 1);
 		}else
 		{
@@ -729,7 +563,6 @@ void Bootloader_EN_R_W_PROTECT(uint8_t *pRxBuffer)
 {
 
 	//Send the number of commands supported by the bootloader
-
 	printMsg("BL_DEBUG_MSG : Bootloader_EN_R_W_PROTECT\n\r");
 
 	//1. Extract packet length
@@ -748,12 +581,12 @@ void Bootloader_EN_R_W_PROTECT(uint8_t *pRxBuffer)
 		bootloader_send_ack(*pRxBuffer, 1);
 
 		//Enable R/W protection of the FLASH area (program OPTION bytes to 0xFF)
-		EN_R_W_Protect();
+		uint8_t err_code = EN_R_W_Protect(pRxBuffer[2], pRxBuffer[3], 0);
 
-		//printMsg("BL_DEBUG_MSG : RDP_Number : %ld %#x\n\r", RDP_Status, RDP_Status);
+		printMsg("BL_DEBUG_MSG : R_W_Protect enabled for : %d \n\r", pRxBuffer[2]);
 
 		//send to the host command
-		//bootloader_uart_write_data(, 1);
+		bootloader_uart_write_data(err_code, 1);
 
 	}else
 	{
@@ -764,12 +597,44 @@ void Bootloader_EN_R_W_PROTECT(uint8_t *pRxBuffer)
 		bootloader_send_nack();
 	}
 
-
-
 }
 
 void Bootloader_DIS_R_W_PROTECT(uint8_t *pRxBuffer)
 {
+	//Send the number of commands supported by the bootloader
+	printMsg("BL_DEBUG_MSG : Bootloader_DIS_R_W_PROTECT\n\r");
+
+	//1. Extract packet length
+	uint32_t packt_len = pRxBuffer[0] + 1;
+
+	//2. Extract the CRC sent by HOST
+	uint32_t Host_CRC = *((uint32_t *)(pRxBuffer + packt_len - 4));
+
+	//3. Verify CRC
+	if(bootloader_verify_crc(pRxBuffer, packt_len - 4, Host_CRC) == CRC_VERIFY_SUCCESS)
+	{
+		//Checksum is correct
+		printMsg("BL_DEBUG_MSG : checksum success !!\n\r");
+
+		//Send ACK to HOST program
+		bootloader_send_ack(*pRxBuffer, 1);
+
+		//Enable R/W protection of the FLASH area (program OPTION bytes to 0xFF)
+		uint8_t err_code = EN_R_W_Protect(pRxBuffer[2], pRxBuffer[3], 1);
+
+		printMsg("BL_DEBUG_MSG : R_W_Protect enabled for : %d \n\r", pRxBuffer[2]);
+
+		//send to the host command
+		bootloader_uart_write_data(err_code, 1);
+
+	}else
+	{
+		//Checksum failure
+		printMsg("BL_DEBUG_MSG : checksum fail !!\n\r");
+
+		//Send NACK to HOST
+		bootloader_send_nack();
+	}
 
 }
 
@@ -815,6 +680,8 @@ void bootloader_send_nack(void)
 uint8_t bootloader_verify_crc(uint8_t pData[], uint32_t len, uint32_t crc_host)
 {
 
+	MX_CRC_Init();
+
 	volatile uint32_t CRCVal = 0x00000000;
 	uint32_t accumulated_data = 0;
 
@@ -823,6 +690,8 @@ uint8_t bootloader_verify_crc(uint8_t pData[], uint32_t len, uint32_t crc_host)
 		accumulated_data = pData[i];
 		CRCVal = HAL_CRC_Accumulate(&hcrc, &accumulated_data, 1);
 	}
+
+	HAL_CRC_DeInit(&hcrc);
 
 	if(CRCVal == crc_host)
 	{
@@ -859,9 +728,66 @@ uint8_t get_RDP_info()
 }
 
 
-void EN_R_W_Protect(void)
+uint8_t EN_R_W_Protect(uint8_t sector_detail, uint8_t protection_mode, uint8_t DISABLE)
 {
+	//First unlock the OPTION Bytes to write to them
+	HAL_FLASH_OB_Unlock();
 
+	while( __HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+
+	if(DISABLE)
+	{
+		//Disable the WRITE protection ionly if the OPTCR bit is not SET that is
+		//it is NOT In PCROP mode
+		if( !(FLASH->OPTCR >> 31 & 0x1) )
+		{
+			//Clean SPRMOD bit in optcr reg
+			FLASH->OPTCR &= ~(0x1 << 31);
+
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+			FLASH->OPTCR |= (0xFF << 16);
+			FLASH->OPTCR |= (0x1 << 1);
+
+			while( __HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+		}
+
+		return 1;
+	}
+
+	if(protection_mode == WRITE_PROTECTION)
+	{
+		if( !(FLASH->OPTCR >> 31 & 0x1) )
+		{
+			//Clean SPRMOD bit in OPTCR reg
+			FLASH->OPTCR &= ~(0x1 << 31);
+
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+			FLASH->OPTCR &= ~(sector_detail << 16);
+
+			FLASH->OPTCR |= (0x1 << 1);
+
+			while( __HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+
+		}else
+		{
+			//OPTCR is in PCROP mode follow accordingly
+		}
+
+	}else if(protection_mode == READ_WRITE_PROTECTION)
+	{
+		//Enable PCROP in OPTCR reg
+		FLASH->OPTCR |= (0x1 << 31);
+
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+		FLASH->OPTCR |= (0X1 << sector_detail);
+		FLASH->OPTCR |= (0x1 << 1);
+
+		while( __HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+	}
+
+	HAL_FLASH_OB_Lock();
+
+	return 1;
 }
 
 uint8_t check_validity(uint32_t addr)
@@ -938,7 +864,7 @@ uint8_t memory_write(uint8_t *buffer, uint32_t Base_addr, uint8_t payload_len)
 	HAL_FLASH_Unlock();
 
 	while(i < payload_len)
-	err_code = HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, Base_addr, buffer[i++]);
+	err_code = HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, Base_addr++, buffer[i++]);
 
 	//Lock the flash module to prevent furhter damage
 	HAL_FLASH_Lock();
@@ -956,6 +882,175 @@ uint8_t memory_write(uint8_t *buffer, uint32_t Base_addr, uint8_t payload_len)
 
 
 
+
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Configure the main internal regulator output voltage
+  */
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 16;
+  RCC_OscInitStruct.PLL.PLLN = 336;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLQ = 2;
+  RCC_OscInitStruct.PLL.PLLR = 2;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief CRC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_CRC_Init(void)
+{
+
+  /* USER CODE BEGIN CRC_Init 0 */
+
+  /* USER CODE END CRC_Init 0 */
+
+  /* USER CODE BEGIN CRC_Init 1 */
+
+  /* USER CODE END CRC_Init 1 */
+  hcrc.Instance = CRC;
+  if (HAL_CRC_Init(&hcrc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN CRC_Init 2 */
+
+  /* USER CODE END CRC_Init 2 */
+
+}
+
+/**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * @brief USART3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART3_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART3_Init 0 */
+
+  /* USER CODE END USART3_Init 0 */
+
+  /* USER CODE BEGIN USART3_Init 1 */
+
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 115200;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
+
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : B1_Pin */
+  GPIO_InitStruct.Pin = B1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LD2_Pin */
+  GPIO_InitStruct.Pin = LD2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+
+}
 
 
 /* USER CODE END 4 */

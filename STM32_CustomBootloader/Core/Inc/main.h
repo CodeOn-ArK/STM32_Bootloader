@@ -155,10 +155,10 @@ uint8_t get_bootloader_version();
 void bootloader_uart_write_data(uint8_t *pRxBuffer, uint8_t len);
 uint32_t get_CID_info();
 uint8_t get_RDP_info();
-void EN_R_W_Protect(void);
 uint8_t check_validity(uint32_t);
 uint32_t flash_eraser(uint8_t sector_num, uint8_t num_of_sector);
-uint8_t memory_write(uint8_t *buffer, uint32_t Base_addr);
+uint8_t memory_write(uint8_t *buffer, uint32_t Base_addr, uint8_t);
+uint8_t EN_R_W_Protect(uint8_t sector_detail, uint8_t protection_mode, uint8_t );
 
 /* USER CODE END EFP */
 
@@ -194,6 +194,8 @@ uint8_t memory_write(uint8_t *buffer, uint32_t Base_addr);
 #define BKPSRAM_END (BKPSRAM_BASE + (BKPSRAM_SIZE * 1024))
 
 #define INVALID_SECTOR 0x1
+#define READ_WRITE_PROTECTION 2
+#define WRITE_PROTECTION 1
 /*
 #define
 #define
