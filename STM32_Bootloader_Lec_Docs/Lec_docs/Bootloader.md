@@ -7,7 +7,7 @@ Bootloaders are provided in nearly all uCs. In absence of an external circuitry 
 Debugger/Programmer), the bootloader acts as a piece of software which programs the flash of the chip.
 Bootloaders are used in IAP(In-Application Programming).
 
-##Arduino example: 
+## Arduino example: 
 
 The atmega328p uC also has a proprietary bootloader in the flash/ROM. Whenever the system undergoes RESET
 the Bootloader is the first program to run in the uC. Bootloader then gives the control to the Application
